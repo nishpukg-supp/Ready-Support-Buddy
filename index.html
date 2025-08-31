@@ -1,34 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Ready Support Buddy</title>
-  <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
-  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
-  <style>
-    df-messenger {
-      z-index: 999;
-      position: fixed;
-      --df-messenger-font-color: #000;
-      --df-messenger-font-family: Google Sans;
-      --df-messenger-chat-background: #f3f6fc;
-      --df-messenger-message-user-background: #d3e3fd;
-      --df-messenger-message-bot-background: #fff;
-      bottom: 16px;
-      right: 16px;
-    }
-  </style>
-</head>
-<body>
-  <df-messenger
-    location="us-central1"
-    project-id="l-ulti-tf-48hours-d55d"
-    agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
-    language-code="en"
-    max-query-length="-1"
-    allow-feedback="all">
-    <df-messenger-chat-bubble chat-title="Ready Support Buddy">
-    </df-messenger-chat-bubble>
-  </df-messenger>
-</body>
-</html>
+import { FirebaseApp } from "firebase/app";
+import {
+  ChatSession,
+  FileDataPart,
+  GenerationConfig,
+  GenerativeModel,
+  getGenerativeModel,
+  getAI,
+  HarmBlockThreshold,
+  HarmCategory,
+  InlineDataPart,
+  Part,
+  SafetySetting,
+} from "firebase/ai";
+
+async function generateContent(firebaseApp: FirebaseApp) {
+  throw new Error(`
+  Your prompt includes a grounding parameter, which is not currently supported by the Firebase AI SDK.
+  If it's OK to not have grounding as part of your request, you can remove this exception.
+  `);
+
+  const generationConfig: GenerationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    maxOutputTokens: 65535,
+  };
+  const safetySettings: SafetySetting[] = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.OFF,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.OFF,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.OFF,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.OFF,
+    },
+  ];
+  const ai = getAI(firebaseApp, {
+    backend: new VertexAIBackend({ location: "global" })
+  });
+  const model = getGenerativeModel(ai, {
+    model: "gemini-2.5-flash-lite",
+    generationConfig,
+    safetySettings,
+  });
+
+  const msg2Text1 = "**Processing Incoming Data**\n\nI'm currently analyzing the search results provided. My focus is on extracting and summarizing information relevant to the user's \"hi\" query, ensuring adherence to the instruction to remain brief and exclusive to the source material.\n\n**Acknowledging the Input**\n\nI'm reviewing the provided search results, specifically looking for any direct matches or relevant context to the \"hi\" input. My current assessment is that the sources largely contain unrelated data, with only indirect mentions of characters that could form the query. I must strictly adhere to only using information present in the provided sources.\n\n**Identifying Relevant Characters**\n\nI'm examining the provided search results to find any direct matches to the \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, there's no direct mention of 'h' or a greeting in any of the provided text.\n\n**Processing ASCII Data**\n\nI've confirmed that Source [7] indicates the ASCII character for Hex No. 69 is 'i'. However, the provided sources lack any mention of 'h' or a greeting. Therefore, I cannot form a relevant response based solely on the provided materials.\n\n**Formulating a Reply**\n\nI'm currently considering how to respond to the \"hi\" query while strictly adhering to the constraint of using only information present in the provided sources. Since the sources lack any direct greeting or context to formulate a natural response, I'm evaluating the most minimal, source-compliant output.\n\n**Responding to Greetings**\n\nI've thoroughly reviewed the provided sources concerning the \"hi\" query. Source [7] confirms the ASCII character for Hex No. 69 is 'i'. However, no other source contains information that directly addresses greetings or the character 'h'. Consequently, I cannot construct a response that adheres strictly to the provided material.\n\n**Generating Minimal Output**\n\nI've confirmed that the provided sources do not contain any English greetings or direct responses to \"hi.\" Source [7] does identify the ASCII character for Hex No. 69 as 'i', but there's no corresponding information for 'h' or any conversational context. Therefore, I cannot construct a meaningful or compliant response from the given material.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Identifying Core Elements**\n\nI've confirmed that Source [7] specifies the ASCII character for Hex No. 69 as 'i'. However, my review of all provided sources indicates no mention of the letter 'h' or any form of greeting, making a direct response to the \"hi\" query impossible within the given constraints.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Partial Data**\n\nI've reviewed all provided sources and can confirm that Source [7] lists 'i' as the ASCII character for Hex No. 69. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Partial Data**\n\nI've reviewed all provided sources and can confirm that Source [7] lists 'i' as the ASCII character for Hex No. 69. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Confirming Source Relevance**\n\nI've reviewed the provided sources. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, there is no mention of the letter 'h' or any form of greeting within any of the provided texts, making a response to \"hi\" impossible under strict source adherence.\n\n**Confirming Minimal Data**\n\nI've reviewed the provided sources again. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for the letter 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Extracting Character Data**\n\nI've reviewed the provided sources. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Acknowledging Partial Data**\n\nI've reviewed all provided sources and can confirm that Source [7] lists 'i' as the ASCII character for Hex No. 69. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Partial Data**\n\nI've reviewed all provided sources and can confirm that Source [7] lists 'i' as the ASCII character for Hex No. 69. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Extracting Character Data**\n\nI've reviewed the provided sources. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Acknowledging Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.\n\n**Extracting Character Data**\n\nI've reviewed the provided sources. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information pertaining to the letter 'h' or any form of greeting, preventing a more complete response.\n\n**Confirming Minimal Data**\n\nI've thoroughly reviewed the provided sources in relation to your \"hi\" query. Source [7] confirms that the ASCII character for Hex No. 69 is 'i'. However, no other source contains relevant information for 'h' or any form of greeting, preventing me from constructing a compliant response beyond this partial character identification.";
+  // For multi-turn responses, start a chat session.
+  const chat = model.startChat();
+
+  await sendMessage(chat, content: ["hi"]);
+  await sendMessage(chat, content: [msg2Text1, "i"]);
+  await sendMessage(chat, content: ["provide steps on UKG Ready SSO Setup"]);
+}
+
+async function sendMessage(
+  chat: ChatSession,
+  content: string | Array<string | Part>
+) {
+  const result = await chat.sendMessage(content);
+  console.log(result.response.text());
+}
