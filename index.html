@@ -7,9 +7,8 @@
     rel="stylesheet"
     href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
   />
-  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger.js"></script>
   <style>
-    /* ====== General Page Styling ====== */
     body {
       background-color: #00b388; /* UKG green */
       margin: 0;
@@ -22,31 +21,27 @@
       justify-content: flex-start;
     }
 
-    /* ====== UKG Logo Styling ====== */
     .ukg-logo {
       width: 160px;
       margin: 30px 0 20px 0;
     }
 
-    /* ====== Resizable container for chatbot ====== */
     #chat-container {
       position: fixed;
       bottom: 16px;
       right: 16px;
-      width: 600px; /* initial width */
-      height: 800px; /* initial height */
+      width: 600px;
+      height: 800px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       background: #e6f2ef;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      resize: none; /* disable native resize to use custom */
-      user-select: none; /* prevent text selection while dragging */
       z-index: 999;
+      resize: none;
     }
 
-    /* Chatbot fills container */
     df-messenger {
       width: 100% !important;
       height: 100% !important;
@@ -61,7 +56,6 @@
       --df-messenger-message-bot-background: #ffffff;
     }
 
-    /* ====== Input Textarea Styling ====== */
     df-messenger::part(input-textarea) {
       min-height: 40px;
       max-height: 150px;
@@ -69,7 +63,6 @@
       resize: vertical;
     }
 
-    /* ====== Resize handle styling ====== */
     #resize-handle {
       position: absolute;
       width: 20px;
@@ -82,6 +75,30 @@
       box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
       user-select: none;
     }
+
+    #chat-controls {
+      position: fixed;
+      bottom: 830px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    #chat-controls button {
+      background-color: #0078d4;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #chat-controls button:hover {
+      background-color: #005a9e;
+    }
   </style>
 </head>
 <body>
@@ -93,7 +110,14 @@
     class="ukg-logo"
   />
 
-  <!-- Resizable chatbot container -->
+  <!-- Resize buttons -->
+  <div id="chat-controls">
+    <button id="increaseSize">➕ Bigger</button>
+    <button id="decreaseSize">➖ Smaller</button>
+    <button id="resetSize">🔄 Reset</button>
+  </div>
+
+  <!-- Resizable Chatbot -->
   <div id="chat-container">
     <df-messenger
       location="us-central1"
@@ -107,7 +131,7 @@
       </df-messenger-chat-bubble>
     </df-messenger>
 
-    <!-- Resize handle -->
+    <!-- Resize drag handle -->
     <div id="resize-handle"></div>
   </div>
 
@@ -116,28 +140,24 @@
     const handle = document.getElementById('resize-handle');
 
     let isResizing = false;
+    let startX, startY, startWidth, startHeight;
 
     handle.addEventListener('mousedown', function(e) {
       e.preventDefault();
       isResizing = true;
-      document.body.style.userSelect = 'none'; // prevent text selection on drag
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(document.defaultView.getComputedStyle(container).width, 10);
+      startHeight = parseInt(document.defaultView.getComputedStyle(container).height, 10);
+      document.body.style.userSelect = 'none';
     });
 
     window.addEventListener('mousemove', function(e) {
       if (!isResizing) return;
-
-      // Calculate new size relative to viewport
-      const newWidth = window.innerWidth - container.getBoundingClientRect().left - 16;
-      const newHeight = window.innerHeight - container.getBoundingClientRect().top - 16;
-
-      // Minimum and maximum size limits (optional)
-      const minWidth = 350;
-      const minHeight = 400;
-      const maxWidth = window.innerWidth - 32; // 16px margin each side
-      const maxHeight = window.innerHeight - 32;
-
-      container.style.width = Math.min(Math.max(newWidth, minWidth), maxWidth) + 'px';
-      container.style.height = Math.min(Math.max(newHeight, minHeight), maxHeight) + 'px';
+      const newWidth = startWidth + e.clientX - startX;
+      const newHeight = startHeight + e.clientY - startY;
+      container.style.width = Math.max(350, newWidth) + 'px';
+      container.style.height = Math.max(400, newHeight) + 'px';
     });
 
     window.addEventListener('mouseup', function(e) {
@@ -145,6 +165,26 @@
         isResizing = false;
         document.body.style.userSelect = 'auto';
       }
+    });
+
+    // Button resizing
+    const incBtn = document.getElementById('increaseSize');
+    const decBtn = document.getElementById('decreaseSize');
+    const resetBtn = document.getElementById('resetSize');
+
+    incBtn.addEventListener('click', () => {
+      container.style.width = (container.offsetWidth + 100) + 'px';
+      container.style.height = (container.offsetHeight + 100) + 'px';
+    });
+
+    decBtn.addEventListener('click', () => {
+      container.style.width = Math.max(350, container.offsetWidth - 100) + 'px';
+      container.style.height = Math.max(400, container.offsetHeight - 100) + 'px';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      container.style.width = '600px';
+      container.style.height = '800px';
     });
   </script>
 
