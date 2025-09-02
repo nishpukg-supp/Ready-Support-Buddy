@@ -28,18 +28,32 @@
       margin: 30px 0 20px 0;
     }
 
-    /* ====== Dialogflow Messenger Styling ====== */
-    df-messenger {
-      z-index: 999;
+    /* ====== Resizable container for chatbot ====== */
+    #chat-container {
       position: fixed;
       bottom: 16px;
       right: 16px;
+      width: 600px; /* initial width */
+      height: 800px; /* initial height */
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: #e6f2ef;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      resize: none; /* disable native resize to use custom */
+      user-select: none; /* prevent text selection while dragging */
+      z-index: 999;
+    }
 
-      /* Resize chat window */
-      --df-messenger-width: 600px; /* Default: 350px */
-      --df-messenger-height: 800px; /* Default: 500px */
+    /* Chatbot fills container */
+    df-messenger {
+      width: 100% !important;
+      height: 100% !important;
 
-      /* Chat styling */
+      --df-messenger-width: 100%;
+      --df-messenger-height: 100%;
+
       --df-messenger-font-color: #000;
       --df-messenger-font-family: Google Sans;
       --df-messenger-chat-background: #e6f2ef;
@@ -54,29 +68,85 @@
       overflow-y: auto;
       resize: vertical;
     }
+
+    /* ====== Resize handle styling ====== */
+    #resize-handle {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #00b388;
+      cursor: se-resize;
+      bottom: 0;
+      right: 0;
+      border-bottom-right-radius: 10px;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+      user-select: none;
+    }
   </style>
 </head>
 <body>
 
   <!-- UKG Logo -->
-<img
-  src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png"
-  alt="UKG Logo"
-  class="ukg-logo"
-/>
+  <img
+    src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png"
+    alt="UKG Logo"
+    class="ukg-logo"
+  />
 
-  <!-- Dialogflow Messenger -->
-  <df-messenger
-    location="us-central1"
-    project-id="l-ulti-tf-48hours-d55d"
-    agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
-    language-code="en"
-    max-query-length="-1"
-    allow-feedback="all"
-  >
-    <df-messenger-chat-bubble chat-title="Ready Support Buddy">
-    </df-messenger-chat-bubble>
-  </df-messenger>
+  <!-- Resizable chatbot container -->
+  <div id="chat-container">
+    <df-messenger
+      location="us-central1"
+      project-id="l-ulti-tf-48hours-d55d"
+      agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
+      language-code="en"
+      max-query-length="-1"
+      allow-feedback="all"
+    >
+      <df-messenger-chat-bubble chat-title="Ready Support Buddy">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+
+    <!-- Resize handle -->
+    <div id="resize-handle"></div>
+  </div>
+
+  <script>
+    const container = document.getElementById('chat-container');
+    const handle = document.getElementById('resize-handle');
+
+    let isResizing = false;
+
+    handle.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      isResizing = true;
+      document.body.style.userSelect = 'none'; // prevent text selection on drag
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (!isResizing) return;
+
+      // Calculate new size relative to viewport
+      const newWidth = window.innerWidth - container.getBoundingClientRect().left - 16;
+      const newHeight = window.innerHeight - container.getBoundingClientRect().top - 16;
+
+      // Minimum and maximum size limits (optional)
+      const minWidth = 350;
+      const minHeight = 400;
+      const maxWidth = window.innerWidth - 32; // 16px margin each side
+      const maxHeight = window.innerHeight - 32;
+
+      container.style.width = Math.min(Math.max(newWidth, minWidth), maxWidth) + 'px';
+      container.style.height = Math.min(Math.max(newHeight, minHeight), maxHeight) + 'px';
+    });
+
+    window.addEventListener('mouseup', function(e) {
+      if (isResizing) {
+        isResizing = false;
+        document.body.style.userSelect = 'auto';
+      }
+    });
+  </script>
 
 </body>
 </html>
