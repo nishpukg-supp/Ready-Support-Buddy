@@ -2,87 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UKG Support Chatbot</title>
   <link
     rel="stylesheet"
     href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
   />
-  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger.js"></script>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
   <style>
     body {
-      background-color: #00b388; /* UKG green */
+      background-color: #00b388;
       margin: 0;
       padding: 0;
-      height: 100vh;
       font-family: "Google Sans", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+      height: 100vh;
     }
 
     .ukg-logo {
+      display: block;
+      margin: 30px auto 20px auto;
       width: 160px;
-      margin: 30px 0 20px 0;
-    }
-
-    #chat-container {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      width: 600px;
-      height: 800px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      background: #e6f2ef;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 999;
-      resize: none;
     }
 
     df-messenger {
-      width: 100% !important;
-      height: 100% !important;
+      /* Controlled sizing via supported CSS variables */
+      --df-messenger-chat-window-width: 420px;
+      --df-messenger-chat-window-height: 600px;
 
-      --df-messenger-width: 100%;
-      --df-messenger-height: 100%;
-
+      /* Styling */
       --df-messenger-font-color: #000;
-      --df-messenger-font-family: Google Sans;
-      --df-messenger-chat-background: #e6f2ef;
-      --df-messenger-message-user-background: #c7f0e0;
-      --df-messenger-message-bot-background: #ffffff;
+      --df-messenger-chat-background-color: #e6f2ef;
+      --df-messenger-button-titlebar-color: #0078d4;
+      --df-messenger-user-message: #c7f0e0;
     }
 
     df-messenger::part(input-textarea) {
       min-height: 40px;
       max-height: 150px;
-      overflow-y: auto;
       resize: vertical;
-    }
-
-    #resize-handle {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: #00b388;
-      cursor: se-resize;
-      bottom: 0;
-      right: 0;
-      border-bottom-right-radius: 10px;
-      box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-      user-select: none;
+      overflow-y: auto;
     }
 
     #chat-controls {
       position: fixed;
-      bottom: 830px;
+      bottom: calc(var(--df-messenger-chat-window-height, 600px) + 40px);
       right: 16px;
       display: flex;
       gap: 8px;
-      z-index: 1000;
+      z-index: 500;
     }
 
     #chat-controls button {
@@ -93,7 +60,7 @@
       font-size: 14px;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s;
     }
 
     #chat-controls button:hover {
@@ -102,7 +69,6 @@
   </style>
 </head>
 <body>
-
   <!-- UKG Logo -->
   <img
     src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png"
@@ -110,83 +76,39 @@
     class="ukg-logo"
   />
 
-  <!-- Resize buttons -->
+  <!-- Buttons for resizing -->
   <div id="chat-controls">
-    <button id="increaseSize">➕ Bigger</button>
-    <button id="decreaseSize">➖ Smaller</button>
-    <button id="resetSize">🔄 Reset</button>
+    <button id="inc">➕ Larger Chat</button>
+    <button id="dec">➖ Smaller Chat</button>
+    <button id="reset">🔄 Reset Size</button>
   </div>
 
-  <!-- Resizable Chatbot -->
-  <div id="chat-container">
-    <df-messenger
-      location="us-central1"
-      project-id="l-ulti-tf-48hours-d55d"
-      agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
-      language-code="en"
-      max-query-length="-1"
-      allow-feedback="all"
-    >
-      <df-messenger-chat-bubble chat-title="Ready Support Buddy">
-      </df-messenger-chat-bubble>
-    </df-messenger>
-
-    <!-- Resize drag handle -->
-    <div id="resize-handle"></div>
-  </div>
+  <!-- Dialogflow Messenger -->
+  <df-messenger
+    location="us-central1"
+    project-id="l-ulti-tf-48hours-d55d"
+    agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
+    language-code="en"
+    max-query-length="-1"
+    allow-feedback="all"
+    chat-title="Ready Support Buddy">
+  </df-messenger>
 
   <script>
-    const container = document.getElementById('chat-container');
-    const handle = document.getElementById('resize-handle');
+    const df = document.querySelector('df-messenger');
+    const inc = document.getElementById('inc');
+    const dec = document.getElementById('dec');
+    const reset = document.getElementById('reset');
+    let width = 420, height = 600;
 
-    let isResizing = false;
-    let startX, startY, startWidth, startHeight;
+    function updateSize() {
+      df.style.setProperty('--df-messenger-chat-window-width', width + 'px');
+      df.style.setProperty('--df-messenger-chat-window-height', height + 'px');
+    }
 
-    handle.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-      isResizing = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      startWidth = parseInt(document.defaultView.getComputedStyle(container).width, 10);
-      startHeight = parseInt(document.defaultView.getComputedStyle(container).height, 10);
-      document.body.style.userSelect = 'none';
-    });
-
-    window.addEventListener('mousemove', function(e) {
-      if (!isResizing) return;
-      const newWidth = startWidth + e.clientX - startX;
-      const newHeight = startHeight + e.clientY - startY;
-      container.style.width = Math.max(350, newWidth) + 'px';
-      container.style.height = Math.max(400, newHeight) + 'px';
-    });
-
-    window.addEventListener('mouseup', function(e) {
-      if (isResizing) {
-        isResizing = false;
-        document.body.style.userSelect = 'auto';
-      }
-    });
-
-    // Button resizing
-    const incBtn = document.getElementById('increaseSize');
-    const decBtn = document.getElementById('decreaseSize');
-    const resetBtn = document.getElementById('resetSize');
-
-    incBtn.addEventListener('click', () => {
-      container.style.width = (container.offsetWidth + 100) + 'px';
-      container.style.height = (container.offsetHeight + 100) + 'px';
-    });
-
-    decBtn.addEventListener('click', () => {
-      container.style.width = Math.max(350, container.offsetWidth - 100) + 'px';
-      container.style.height = Math.max(400, container.offsetHeight - 100) + 'px';
-    });
-
-    resetBtn.addEventListener('click', () => {
-      container.style.width = '600px';
-      container.style.height = '800px';
-    });
+    inc.addEventListener('click', () => { width = Math.min(width + 100, 800); height = Math.min(height + 150, 1000); updateSize(); });
+    dec.addEventListener('click', () => { width = Math.max(width - 100, 300); height = Math.max(height - 150, 400); updateSize(); });
+    reset.addEventListener('click', () => { width = 420; height = 600; updateSize(); });
   </script>
-
 </body>
 </html>
