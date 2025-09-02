@@ -2,38 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dialogflow Chatbot</title>
+  <title>UKG Support Chatbot</title>
   <link
     rel="stylesheet"
     href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
   />
   <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+  <style>
+    /* UKG-Themed Background and Styling */
+    body {
+      background-color: #00b388; /* UKG green */
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: "Google Sans", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Optional UKG logo styling */
+    .ukg-logo {
+      width: 160px;
+      margin: 30px 0 20px 0;
+    }
+
+    /* Dialogflow Messenger styling */
+    df-messenger {
+      z-index: 999;
+      position: fixed;
+      --df-messenger-font-color: #000;
+      --df-messenger-font-family: Google Sans;
+      --df-messenger-chat-background: #e6f2ef;
+      --df-messenger-message-user-background: #c7f0e0;
+      --df-messenger-message-bot-background: #ffffff;
+      bottom: 16px;
+      right: 16px;
+    }
+  </style>
 </head>
 <body>
-  <style>
-  body {
-    background-image: url('https://www.ukg.com/themes/custom/ukg/images/ukg-logo.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 300px;
-    background-color: #f3f6fc; /* Light UKG-style color */
-    height: 100vh;
-    margin: 0;
-  }
 
-  df-messenger {
-    z-index: 999;
-    position: fixed;
-    --df-messenger-font-color: #000;
-    --df-messenger-font-family: Google Sans;
-    --df-messenger-chat-background: #f3f6fc;
-    --df-messenger-message-user-background: #d3e3fd;
-    --df-messenger-message-bot-background: #fff;
-    bottom: 16px;
-    right: 16px;
-  }
-</style>
+  <!-- UKG Logo -->
+  <img
+    src="https://www.ukg.com/themes/custom/ukg/images/ukg-logo.svg"
+    alt="UKG Logo"
+    class="ukg-logo"
+  />
 
+  <!-- Dialogflow Messenger Bot -->
   <df-messenger
     location="us-central1"
     project-id="l-ulti-tf-48hours-d55d"
@@ -46,18 +64,5 @@
     </df-messenger-chat-bubble>
   </df-messenger>
 
-  <style>
-    df-messenger {
-      z-index: 999;
-      position: fixed;
-      --df-messenger-font-color: #000;
-      --df-messenger-font-family: Google Sans;
-      --df-messenger-chat-background: #f3f6fc;
-      --df-messenger-message-user-background: #d3e3fd;
-      --df-messenger-message-bot-background: #fff;
-      bottom: 16px;
-      right: 16px;
-    }
-  </style>
 </body>
 </html>
