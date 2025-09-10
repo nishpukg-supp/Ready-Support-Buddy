@@ -83,12 +83,29 @@
       transition: transform .22s cubic-bezier(.2,.6,.2,1), opacity .2s ease;
       opacity:0;
     }
-    .chat-shell.open{ display:block; opacity:1; animation: chatIn .22s cubic-bezier(.2,.6,.2,1); }
-    @keyframes chatIn{ from{ transform: translateY(8px) scale(.985); opacity:.0; } to{ transform: translateY(0) scale(1); opacity:1; } }
-    @media (max-width: 640px){ .chat-shell{ right:12px; left:12px; bottom:82px; width:auto; height: min(78svh, 720px); border-radius: 14px; } }
+    .chat-shell.open{
+      display:block;
+      opacity:1;
+      animation: chatIn .22s cubic-bezier(.2,.6,.2,1);
+    }
+    @keyframes chatIn{
+      from{ transform: translateY(8px) scale(.985); opacity:.0; }
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+    @media (max-width: 640px){
+      .chat-shell{
+        right:12px; left:12px; bottom:82px;
+        width:auto; height: min(78svh, 720px);
+        border-radius: 14px;
+      }
+    }
 
     /* Controls bar */
-    #chat-controls{ position:fixed; right:16px; bottom: calc(16px + 48px + 12px); z-index:1250; display:flex; gap:8px; flex-wrap:wrap; opacity:.95; }
+    #chat-controls{
+      position:fixed; right:16px; bottom: calc(16px + 48px + 12px);
+      z-index:1250; display:flex; gap:8px; flex-wrap:wrap;
+      opacity:.95;
+    }
     .ctrl-btn{
       background: var(--ukg-primary);
       border:none; color:#fff; padding:8px 12px; font-size:14px;
@@ -102,7 +119,13 @@
     .ctrl-btn:focus-visible{ outline:3px solid #fff; outline-offset:2px; }
 
     /* Toast */
-    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#111; color:#fff; padding:10px 14px; border-radius:10px; box-shadow: var(--shadow); z-index:1400; opacity:0; pointer-events:none; transition: opacity .18s ease, transform .18s ease; }
+    .toast{
+      position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+      background:#111; color:#fff; padding:10px 14px;
+      border-radius:10px; box-shadow: var(--shadow); z-index:1400;
+      opacity:0; pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
     .toast.show{ opacity:1; transform: translate(-50%, -4px); }
 
     /* DF Messenger theming */
@@ -113,62 +136,32 @@
       --df-messenger-chat-background-color: var(--ukg-surface);
       --df-messenger-button-titlebar-color: var(--ukg-primary);
       --df-messenger-user-message: var(--ukg-user-bubble);
-      width:100%; height:100%; display:block;
+      width:100%; height:100%;
+      display:block;
     }
-
-    /* Suggested chips */
-    .chips{ position:fixed; right:16px; bottom: calc(80px + var(--chip-offset, 0px)); z-index:1260; display:flex; gap:8px; flex-wrap:wrap; max-width: min(420px, 90vw); }
-    .chip{ background:#fff; border:1px solid rgba(0,0,0,.08); padding:8px 10px; border-radius:999px; cursor:pointer; box-shadow: 0 2px 10px rgba(0,0,0,.08); transition: transform .12s ease, box-shadow .12s ease; }
-    .chip:hover{ transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
-
-    /* Typing avatar bubble */
-    .typing-avatar{ position:fixed; right: calc(16px + 6px); bottom: calc(80px + var(--chat-h, 600px) + 12px); width:36px; height:36px; border-radius:50%; background:#fff; box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; z-index:1180; opacity:0; transform: translateY(6px); transition: opacity .15s ease, transform .15s ease; }
-    .typing-avatar.show{ opacity:1; transform: translateY(0); }
-    .dotty{ display:inline-block; width:22px; text-align:center; }
-    .dotty span{ display:inline-block; width:5px; height:5px; margin:0 1px; background:#666; border-radius:50%; animation: blink 1s infinite ease-in-out; }
-    .dotty span:nth-child(2){ animation-delay:.16s; }
-    .dotty span:nth-child(3){ animation-delay:.32s; }
-    @keyframes blink{ 0%,80%,100%{ opacity:.3; transform: translateY(0); } 40%{ opacity:1; transform: translateY(-2px); } }
-
-    /* Confetti canvas overlay */
-    #confetti{ position:fixed; inset:0; pointer-events:none; z-index:1500; display:none; }
-
-    /* Fallback panel if DF fails */
-    .fallback{ position:fixed; right:16px; bottom:80px; width: min(420px, calc(100vw - 24px)); background:#fff; border-radius: var(--radius); box-shadow: var(--shadow); padding:16px; z-index:1100; display:none; }
-    .fallback h3{ margin:0 0 8px; }
-    .fallback p{ margin:0 0 12px; }
 
     /* Respect motion sensitivity */
     @media (prefers-reduced-motion: reduce){
-      .chat-shell, .chat-launcher, .ctrl-btn, .toast, .chip, .typing-avatar{ transition:none !important; animation:none !important; }
+      .chat-shell, .chat-launcher, .ctrl-btn, .toast{ transition:none !important; animation:none !important; }
     }
   </style>
 </head>
 <body>
-  <img src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png" alt="UKG" class="ukg-logo" referrerpolicy="no-referrer" />
+  <img
+    src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png"
+    alt="UKG"
+    class="ukg-logo"
+    referrerpolicy="no-referrer"
+  />
 
   <!-- Launcher -->
-  <button class="chat-launcher" id="launcher" aria-pressed="false" aria-controls="chat" aria-label="Open Ready Support Buddy chat">💬 <span>Chat with Ready Support Buddy</span></button>
-
-  <!-- Chips (suggested prompts) -->
-  <div class="chips" id="chips" aria-label="Suggested prompts" hidden>
-    <button class="chip" data-text="Help me reset my UKG Pro password">Reset password</button>
-    <button class="chip" data-text="What is my PTO balance policy?">PTO policy</button>
-    <button class="chip" data-text="Create a support ticket for payroll issue">Create ticket</button>
-  </div>
-
-  <!-- Typing avatar bubble -->
-  <div class="typing-avatar" id="typingAvatar" aria-hidden="true">
-    <div class="dotty" aria-label="Assistant is typing"><span></span><span></span><span></span></div>
-  </div>
-
-  <!-- Confetti overlay -->
-  <canvas id="confetti"></canvas>
+  <button class="chat-launcher" id="launcher" aria-pressed="false" aria-controls="chat" aria-label="Open Ready Support Buddy chat">
+    💬 <span>Chat with Ready Support Buddy</span>
+  </button>
 
   <!-- Chat shell animates; DF fills it -->
   <div class="chat-shell" id="chat" role="dialog" aria-label="Ready Support Buddy Chat" aria-modal="false">
     <df-messenger
-      id="df"
       location="us-central1"
       project-id="l-ulti-tf-48hours-d55d"
       agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
@@ -186,14 +179,6 @@
     <button class="ctrl-btn" id="reset" aria-label="Reset chat size">🔄 Reset</button>
   </div>
 
-  <!-- Fallback if df-messenger fails to load -->
-  <div class="fallback" id="fallback">
-    <h3>We couldn't load the chat right now</h3>
-    <p>Please check your connection and try again.</p>
-    <button class="ctrl-btn" id="retry">Try again</button>
-    <a class="ctrl-btn" href="mailto:support@ukg.com">Email support</a>
-  </div>
-
   <!-- Toast -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -205,98 +190,78 @@
       const dec = document.getElementById('dec');
       const reset = document.getElementById('reset');
       const toast = document.getElementById('toast');
-      const chips = document.getElementById('chips');
-      const fallback = document.getElementById('fallback');
-      const retry = document.getElementById('retry');
-      const typingAvatar = document.getElementById('typingAvatar');
-      const df = document.getElementById('df');
-      const confettiCanvas = document.getElementById('confetti');
 
-      // STATE
+      // State
       let w = parseInt(localStorage.getItem('chat-w') || '420', 10);
       let h = parseInt(localStorage.getItem('chat-h') || '600', 10);
       let open = JSON.parse(localStorage.getItem('chat-open') || 'true');
-      let typing = false;
 
-      // Helpers
-      function applySize(){ document.documentElement.style.setProperty('--chat-w', w + 'px'); document.documentElement.style.setProperty('--chat-h', h + 'px'); }
-      function setOpen(next){
-        open = next; localStorage.setItem('chat-open', JSON.stringify(open)); launcher.setAttribute('aria-pressed', String(open)); shell.classList.toggle('open', open);
-        if(open){ shell.style.opacity = '1'; shell.style.display = 'block'; chips.hidden = false; document.documentElement.style.setProperty('--chip-offset', '0px'); }
-        else { shell.style.opacity = '0'; setTimeout(()=>{ if(!open) shell.style.display='none'; }, 180); document.documentElement.style.setProperty('--chip-offset', '-2000px'); }
+      // Apply size (through CSS vars that the shell uses)
+      function applySize(){
+        document.documentElement.style.setProperty('--chat-w', w + 'px');
+        document.documentElement.style.setProperty('--chat-h', h + 'px');
       }
-      function saveAndToast(text){ toast.textContent = text; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 1200); }
-      function updateSize(dw, dh){ const prevW=w, prevH=h; w = Math.max(300, Math.min(800, w + dw)); h = Math.max(400, Math.min(1000, h + dh)); if(w!==prevW||h!==prevH){ applySize(); localStorage.setItem('chat-w', w); localStorage.setItem('chat-h', h); saveAndToast(`Resized to ${w}×${h}`); } }
+      applySize();
 
-      applySize(); setOpen(open);
+      // Launcher toggle
+      function setOpen(next){
+        open = next;
+        localStorage.setItem('chat-open', JSON.stringify(open));
+        launcher.setAttribute('aria-pressed', String(open));
+        shell.classList.toggle('open', open);
+        if(open){
+          shell.style.opacity = '1';
+          shell.style.display = 'block';
+        } else {
+          shell.style.opacity = '0';
+          setTimeout(()=>{ if(!open) shell.style.display='none'; }, 180);
+        }
+      }
+      setOpen(open);
 
       launcher.addEventListener('click', () => setOpen(!open));
+
+      // Controls
+      function saveAndToast(text){
+        localStorage.setItem('chat-w', w);
+        localStorage.setItem('chat-h', h);
+        toast.textContent = text;
+        toast.classList.add('show');
+        setTimeout(()=> toast.classList.remove('show'), 1200);
+      }
+      function updateSize(dw, dh){
+        const prevW = w, prevH = h;
+        w = Math.max(300, Math.min(800, w + dw));
+        h = Math.max(400, Math.min(1000, h + dh));
+        if(w !== prevW || h !== prevH){
+          applySize();
+          saveAndToast(`Resized to ${w}×${h}`);
+        }
+      }
       inc.addEventListener('click', () => updateSize(100, 150));
       dec.addEventListener('click', () => updateSize(-100, -150));
-      reset.addEventListener('click', () => { w = 420; h = 600; applySize(); localStorage.setItem('chat-w', w); localStorage.setItem('chat-h', h); saveAndToast('Size reset'); });
+      reset.addEventListener('click', () => { w = 420; h = 600; applySize(); saveAndToast('Size reset'); });
 
       // Keyboard shortcuts
-      window.addEventListener('keydown', (e)=>{ if (e.target && ['INPUT','TEXTAREA'].includes(e.target.tagName)) return; if (e.key === '+') { updateSize(100,150); } if (e.key === '-') { updateSize(-100,-150); } if (e.key === '0') { w=420; h=600; applySize(); saveAndToast('Size reset'); } if (e.key === 'Escape') { setOpen(!open); } });
+      window.addEventListener('keydown', (e)=>{
+        if (e.target && ['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
+        if (e.key === '+' || (e.key === '=' && (e.ctrlKey || e.metaKey))) { updateSize(100,150); }
+        if (e.key === '-') { updateSize(-100,-150); }
+        if (e.key === '0') { w=420; h=600; applySize(); saveAndToast('Size reset'); }
+        if (e.key === 'Escape') { setOpen(!open); }
+      });
 
       // First-time nudge (once)
       if (!localStorage.getItem('rb-welcome-shown')){
-        setTimeout(()=>{ if (!open){ toast.textContent = "Hi! I can help with UKG support questions."; toast.classList.add('show'); setTimeout(()=> toast.classList.remove('show'), 3000); } localStorage.setItem('rb-welcome-shown','1'); }, 1200);
+        setTimeout(()=>{
+          if (!open){
+            toast.textContent = "Hi! I can help with UKG support questions.";
+            toast.classList.add('show');
+            setTimeout(()=> toast.classList.remove('show'), 3000);
+          }
+          localStorage.setItem('rb-welcome-shown','1');
+        }, 1200);
       }
-
-      // Suggested chips -> try to send programmatically; fallback: open & notify
-      chips.addEventListener('click', (e)=>{
-        const btn = e.target.closest('.chip'); if(!btn) return; const text = btn.getAttribute('data-text'); setOpen(true);
-        try {
-          if (df && typeof df.renderCustomText === 'function') { df.renderCustomText(text); }
-          else if (df && df.shadowRoot) {
-            // Attempt to set the internal textarea if accessible (may not be due to shadow);
-            const ta = df.shadowRoot.querySelector('textarea');
-            if (ta){ ta.value = text; ta.dispatchEvent(new Event('input', {bubbles:true})); ta.focus(); }
-            saveAndToast('Added to input');
-          } else { saveAndToast('Type: ' + text); }
-        } catch(err){ saveAndToast('Try typing: ' + text); }
-      });
-
-      // DF load guard – if custom element not defined after a while, show fallback
-      function checkDfReady(){
-        const defined = customElements.get('df-messenger');
-        if (!defined) { fallback.style.display = 'block'; }
-      }
-      setTimeout(checkDfReady, 3500);
-      if (retry) retry.addEventListener('click', ()=> location.reload());
-
-      // Typing indicator hook: df emits df-request-sent / df-response-received
-      function setTyping(on){ typing = !!on; typingAvatar.classList.toggle('show', typing); typingAvatar.setAttribute('aria-hidden', String(!typing)); }
-      df?.addEventListener('df-request-sent', ()=> setTyping(true));
-      df?.addEventListener('df-response-received', ()=> setTyping(false));
-
-      // Confetti: call celebrate() after key successes (you can trigger this from fulfillment via event bridge if needed)
-      function celebrate(duration=800){
-        const ctx = confettiCanvas.getContext('2d');
-        confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; confettiCanvas.style.display='block';
-        const pieces = Array.from({length: 120}, ()=> ({
-          x: Math.random()*confettiCanvas.width,
-          y: -10-Math.random()*confettiCanvas.height*0.3,
-          r: 4+Math.random()*7,
-          vx: -2+Math.random()*4,
-          vy: 3+Math.random()*4,
-          rot: Math.random()*Math.PI,
-          vr: -0.2 + Math.random()*0.4,
-          c: `hsl(${Math.floor(Math.random()*360)},80%,60%)`
-        }));
-        let start = performance.now();
-        (function tick(t){
-          const elapsed = t - start; ctx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
-          pieces.forEach(p=>{ p.x += p.vx; p.y += p.vy; p.rot += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c; ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r); ctx.restore(); });
-          if (elapsed < duration){ requestAnimationFrame(tick); } else { confettiCanvas.style.display='none'; }
-        })(start);
-      }
-      // Expose for fulfillment-triggerable celebration: window.RSB_confetti()
-      window.RSB_confetti = celebrate;
-
-      // Example: celebrate on URL hash (for quick manual test: add #celebrate)
-      if (location.hash === '#celebrate'){ setTimeout(()=> celebrate(), 600); }
-
     })();
   </script>
 </body>
