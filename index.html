@@ -1,524 +1,231 @@
-<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <title>UKG Ready Support Buddy</title>
+<head>
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UKG Support Chatbot</title>
+<link
+rel="stylesheet"
+href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css"
+/>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger.js"></script>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+<style>
+body {
+      background-color: #00b388; /* UKG green */
+      background-color: #00b388;
+margin: 0;
+padding: 0;
+      height: 100vh;
+font-family: "Google Sans", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+}
 
-    <!-- Dialogflow Messenger assets -->
-    <link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
-    <script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
+.ukg-logo {
+      display: block;
+      margin: 30px auto 20px auto;
+width: 160px;
+      margin: 30px 0 20px 0;
+    }
 
-    <!-- Performance niceties -->
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://www.gstatic.com">
+    #chat-container {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 600px;
+      height: 800px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: #e6f2ef;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 999;
+      resize: none;
+}
 
-    <style>
-      :root{
-        --ukg-light-teal:#30CEBB; --ukg-dark-teal:#005151; --ukg-lime:#78D64B; --ukg-blue:#29C2DE;
-        --ukg-fuchsia:#C724B1; --ukg-yellow:#FFC600; --ukg-purple:#59178A;
-        --ukg-dark-gray:#53565A; --ukg-light-gray:#F5F5F5;
+df-messenger {
+      width: 100% !important;
+      height: 100% !important;
 
-        --text-900:#0b1220; --text-700:#263445; --bg-50:#f6f8fb;
-        --radius-xl:16px; --shadow-md:0 10px 30px rgba(16,24,40,.12); --shadow-sm:0 2px 10px rgba(16,24,40,.08);
-        --content-max:1100px; --panel-width:420px;
+      --df-messenger-width: 100%;
+      --df-messenger-height: 100%;
+      /* Controlled sizing via supported CSS variables */
+      --df-messenger-chat-window-width: 420px;
+      --df-messenger-chat-window-height: 600px;
 
-        --z-banner: 1000; --z-overlay: 999998; --z-drawer: 999999; --z-header: 1000001; --z-popover: 1000002;
+      /* Styling */
+--df-messenger-font-color: #000;
+      --df-messenger-font-family: Google Sans;
+      --df-messenger-chat-background: #e6f2ef;
+      --df-messenger-message-user-background: #c7f0e0;
+      --df-messenger-message-bot-background: #ffffff;
+      --df-messenger-chat-background-color: #e6f2ef;
+      --df-messenger-button-titlebar-color: #0078d4;
+      --df-messenger-user-message: #c7f0e0;
+}
+
+df-messenger::part(input-textarea) {
+min-height: 40px;
+max-height: 150px;
+      overflow-y: auto;
+resize: vertical;
+    }
+
+    #resize-handle {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #00b388;
+      cursor: se-resize;
+      bottom: 0;
+      right: 0;
+      border-bottom-right-radius: 10px;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+      user-select: none;
+      overflow-y: auto;
+}
+
+#chat-controls {
+position: fixed;
+      bottom: 830px;
+      bottom: calc(var(--df-messenger-chat-window-height, 600px) + 40px);
+right: 16px;
+display: flex;
+gap: 8px;
+      z-index: 1000;
+      z-index: 500;
+}
+
+#chat-controls button {
+@@ -93,7 +60,7 @@
+font-size: 14px;
+border-radius: 4px;
+cursor: pointer;
+      transition: background-color 0.3s ease;
+      transition: background-color 0.3s;
+}
+
+#chat-controls button:hover {
+@@ -102,91 +69,46 @@
+</style>
+</head>
+<body>
+
+<!-- UKG Logo -->
+<img
+src="https://www.ukg.com/themes/custom/ukg/dist/images/logo-green.png"
+alt="UKG Logo"
+class="ukg-logo"
+/>
+
+  <!-- Resize buttons -->
+  <!-- Buttons for resizing -->
+<div id="chat-controls">
+    <button id="increaseSize">➕ Bigger</button>
+    <button id="decreaseSize">➖ Smaller</button>
+    <button id="resetSize">🔄 Reset</button>
+    <button id="inc">➕ Larger Chat</button>
+    <button id="dec">➖ Smaller Chat</button>
+    <button id="reset">🔄 Reset Size</button>
+</div>
+
+  <!-- Resizable Chatbot -->
+  <div id="chat-container">
+    <df-messenger
+      location="us-central1"
+      project-id="l-ulti-tf-48hours-d55d"
+      agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
+      language-code="en"
+      max-query-length="-1"
+      allow-feedback="all"
+    >
+      <df-messenger-chat-bubble chat-title="Ready Support Buddy">
+      </df-messenger-chat-bubble>
+    </df-messenger>
+
+    <!-- Resize drag handle -->
+    <div id="resize-handle"></div>
+  </div>
+  <!-- Dialogflow Messenger -->
+  <df-messenger
+    location="us-central1"
+    project-id="l-ulti-tf-48hours-d55d"
+    agent-id="273402c4-3e14-486c-a519-ef1a95c4dbd5"
+    language-code="en"
+    max-query-length="-1"
+    allow-feedback="all"
+    chat-title="Ready Support Buddy">
+  </df-messenger>
+
+<script>
+    const container = document.getElementById('chat-container');
+    const handle = document.getElementById('resize-handle');
+
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+
+    handle.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = parseInt(document.defaultView.getComputedStyle(container).width, 10);
+      startHeight = parseInt(document.defaultView.getComputedStyle(container).height, 10);
+      document.body.style.userSelect = 'none';
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (!isResizing) return;
+      const newWidth = startWidth + e.clientX - startX;
+      const newHeight = startHeight + e.clientY - startY;
+      container.style.width = Math.max(350, newWidth) + 'px';
+      container.style.height = Math.max(400, newHeight) + 'px';
+    });
+
+    window.addEventListener('mouseup', function(e) {
+      if (isResizing) {
+        isResizing = false;
+        document.body.style.userSelect = 'auto';
       }
+    });
 
-      html, body { height:100%; margin:0; background:var(--bg-50); color:var(--text-900);
-        font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    // Button resizing
+    const incBtn = document.getElementById('increaseSize');
+    const decBtn = document.getElementById('decreaseSize');
+    const resetBtn = document.getElementById('resetSize');
 
-      /* ===== Site Banner ===== */
-      .site-banner { position:sticky; top:0; z-index:var(--z-banner); color:#fff; box-shadow:var(--shadow-sm);
-        background: linear-gradient(135deg, var(--ukg-dark-teal), #007a7a, #008f8f);
-        background-size: 200% 200%; animation: bannerShift 10s ease infinite; }
-      @keyframes bannerShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-      .site-banner__inner { max-width:var(--content-max); margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px; }
-      .site-banner__logo { width:124px; height:32px; display:inline-flex; align-items:center; justify-content:center; }
-      .site-banner__logo img { display:block; height:100%; width:auto; object-fit:contain; }
-      .site-banner__title { font-size:18px; font-weight:700; letter-spacing:.2px; margin:0; display:flex; align-items:center; gap:8px; }
-      .badge { font-size:11px; font-weight:800; letter-spacing:.3px; padding:2px 6px; border-radius:999px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.35); }
-      .site-banner__tagline { margin-left:auto; font-size:13px; display:inline-flex; gap:8px; align-items:center;
-        background:rgba(255,255,255,.16); padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.22); }
-      .status-dot { width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 0 3px rgba(74,222,128,.25);
-        animation: pulse 2s ease-in-out infinite; }
-      @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    incBtn.addEventListener('click', () => {
+      container.style.width = (container.offsetWidth + 100) + 'px';
+      container.style.height = (container.offsetHeight + 100) + 'px';
+    });
 
-      /* ===== Content ===== */
-      .page-wrapper { max-width:var(--content-max); margin:16px auto; padding:0 20px 80px; }
-      .hero { background:#fff; border-radius:var(--radius-xl); box-shadow:var(--shadow-md); padding:20px; display:flex; align-items:center; gap:18px; border:1px solid rgba(0,0,0,0.04); }
-      .hero__logo{ width:48px; height:48px; display:grid; place-items:center; border-radius:12px; background:transparent; flex:0 0 auto; }
-      .hero__logo img{ display:block; width:100%; height:100%; object-fit:contain; }
-      .hero__title{ font-size:18px; font-weight:700; margin:0 0 6px; }
-      .hero__text{ margin:0; color:var(--text-700); font-size:14px; }
+    decBtn.addEventListener('click', () => {
+      container.style.width = Math.max(350, container.offsetWidth - 100) + 'px';
+      container.style.height = Math.max(400, container.offsetHeight - 100) + 'px';
+    });
+    const df = document.querySelector('df-messenger');
+    const inc = document.getElementById('inc');
+    const dec = document.getElementById('dec');
+    const reset = document.getElementById('reset');
+    let width = 420, height = 600;
 
-      .cta{ margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
-      .btn{ appearance:none; cursor:pointer; border-radius:12px; padding:10px 14px; font-weight:700; border:1px solid transparent; }
-      .btn--brand{ background:var(--ukg-light-teal); color:#063B3B; }
-      .btn--ghost{ background:#fff; color:#0b1220; border-color:#d1d5db; }
-      .chip{ font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid #d1d5db; background:#fff; cursor:pointer; }
+    function updateSize() {
+      df.style.setProperty('--df-messenger-chat-window-width', width + 'px');
+      df.style.setProperty('--df-messenger-chat-window-height', height + 'px');
+    }
 
-      /* ===== Overlay & Drawer ===== */
-      #botOverlay{ position:fixed; inset:0; background:rgba(6,24,24,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-        opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:var(--z-overlay); }
-      #botOverlay.open{ opacity:1; pointer-events:auto; }
+    resetBtn.addEventListener('click', () => {
+      container.style.width = '600px';
+      container.style.height = '800px';
+    });
+    inc.addEventListener('click', () => { width = Math.min(width + 100, 800); height = Math.min(height + 150, 1000); updateSize(); });
+    dec.addEventListener('click', () => { width = Math.max(width - 100, 300); height = Math.max(height - 150, 400); updateSize(); });
+    reset.addEventListener('click', () => { width = 420; height = 600; updateSize(); });
+</script>
 
-      #botDrawer{ position:fixed; top:0; right:0; height:100dvh; width:var(--panel-width); max-width:100vw; background:#fff;
-        transform:translateX(100%); transition:transform .25s ease; z-index:var(--z-drawer);
-        box-shadow:0 10px 30px rgba(0,0,0,.25); display:flex; flex-direction:column; border-left:1px solid #e5e7eb;
-        padding-bottom:env(safe-area-inset-bottom); }
-      #botDrawer.open{ transform:translateX(0); }
-
-      #drawerHeader{ position:relative; z-index:var(--z-header); overflow:visible;
-        display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--ukg-dark-teal); color:#fff; }
-      #drawerHeader img{ height:22px; width:auto; }
-      #drawerTitle{ font-weight:700; margin-right:auto; }
-      #drawerClose{ background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:#fff; border-radius:8px; padding:6px 10px; cursor:pointer; }
-
-      /* Toolbar under banner */
-      #drawerToolbar { display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px solid #e5e7eb; background:#fff; }
-      .tabs{ display:flex; gap:6px; background:#f4f6fa; padding:4px; border-radius:10px; }
-      .tab{ border:none; background:transparent; color:#0b1220; padding:6px 8px; border-radius:8px; font-weight:700; cursor:pointer; opacity:.9; }
-      .tab[aria-selected="true"]{ background:#e8edf7; }
-      .menu { position: relative; margin-left:auto; }
-      .menu__btn { background:#f4f6fa; border:1px solid #d7dde9; color:#0b1220; border-radius:8px; padding:6px 10px; cursor:pointer; font-weight:700; }
-      .menu__popover { position:absolute; right:0; top:calc(100% + 6px); background:#ffffff; color:#0b1220; border:1px solid #e5e7eb; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.12);
-        width:220px; display:none; overflow:hidden; z-index:var(--z-popover); }
-      .menu__popover.open { display:block; }
-      .menu__item { display:block; width:100%; text-align:left; background:#fff; border:0; padding:10px 12px; font-weight:600; cursor:pointer; }
-      .menu__item:hover { background:#f5f7fb; }
-      .menu__hint { font-size:12px; color:#586170; padding:8px 12px 10px; border-top:1px solid #eef1f6; }
-
-      /* Drawer body & panels */
-      #drawerBody { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-      .panel { display: none; flex: 1 1 auto; min-height: 0; }
-      .panel.active { display: block; }
-
-      /* Strong fill so input is visible */
-      #panelChat { position: relative; }
-      #panelChat df-messenger { position:absolute; inset:0; width:100%; height:100%; min-height:560px; display:block; }
-
-      /* DF theming */
-      df-messenger{
-        --df-messenger-font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        --df-messenger-font-color:#0b1220;
-        --df-messenger-chat-background:#ffffff;
-        --df-messenger-message-user-background:#e9fbf8;
-        --df-messenger-message-bot-background:#f8fafc;
-        --df-messenger-input-box-color:#ffffff;
-        --df-messenger-button-color:var(--ukg-light-teal);
-        --df-messenger-button-hover-color:#45d6c7;
-        --df-messenger-send-icon:var(--ukg-dark-teal);
-        --df-messenger-titlebar-color:var(--ukg-dark-teal);
-        --df-messenger-titlebar-title-color:#ffffff;
-      }
-
-      @media (max-width:520px){
-        .site-banner__title{ font-size:16px }
-        .site-banner__tagline{ display:none }
-        #botDrawer{ width:100vw }
-        #drawerToolbar{ flex-wrap:wrap; gap:6px; }
-      }
-
-      @media (prefers-color-scheme: dark){
-        :root{ --bg-50:#0f1723; --text-900:#eaeef5; --text-700:#c6cfdb; }
-        body{ background: var(--bg-50); color: var(--text-900); }
-        .hero{ background:#111827; border-color:rgba(255,255,255,.06); }
-        #botDrawer{ background:#0f1723; }
-        #drawerHeader{ background:var(--ukg-dark-teal); }
-        #drawerToolbar{ background:#0f1723; border-bottom-color:#243143; }
-        .tabs{ background:#101b2a; }
-        .tab{ color:#eaeef5; }
-        .tab[aria-selected="true"]{ background:#132235; }
-        .menu__btn{ background:#101b2a; color:#eaeef5; border-color:#2a3a52; }
-        .menu__popover { background:#0f1723; color:#eaeef5; border-color:#263244; }
-        .menu__item { background:#0f1723; color:#eaeef5; }
-        .menu__item:hover { background:#111c2a; }
-        .menu__hint { border-top-color:#263244; color:#9fb0c5; }
-        df-messenger{
-          --df-messenger-font-color:#eaeef5;
-          --df-messenger-chat-background:#0f1723;
-          --df-messenger-message-user-background:#0a2f2c;
-          --df-messenger-message-bot-background:#101928;
-          --df-messenger-titlebar-color:var(--ukg-dark-teal);
-          --df-messenger-titlebar-title-color:#ffffff;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Site Banner -->
-    <header class="site-banner" role="banner" aria-label="UKG banner">
-      <div class="site-banner__inner">
-        <div class="site-banner__logo" aria-hidden="true">
-          <img src="https://ukginc.sharepoint.com/teams/Nish/SiteAssets/UKG%20Logo%20Large.png" alt="UKG logo" width="234" height="80" loading="lazy" decoding="async">
-        </div>
-        <h1 class="site-banner__title">UKG Ready Support Buddy <span class="badge">BETA</span></h1>
-        <div class="site-banner__tagline" title="Our purpose is people">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Our purpose is people</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Page Content -->
-    <main class="page-wrapper" role="main">
-      <section class="hero" aria-label="About this assistant">
-        <div class="hero__logo">
-          <img src="https://ukginc.sharepoint.com/teams/Nish/SiteAssets/ukg-emoji-white.png" alt="UKG mark" width="48" height="48" loading="lazy" decoding="async">
-        </div>
-        <div>
-          <h2 class="hero__title">Ask Ready questions anytime</h2>
-          <p class="hero__text">Product, processes, and “how-to” help — click the button to open chat.</p>
-          <div class="cta">
-            <button id="openDrawerBtn" class="btn btn--brand" type="button" aria-controls="botDrawer" aria-expanded="false">Open chat</button>
-            <button id="closeDrawerBtn" class="btn btn--ghost" type="button" style="display:none;">Close chat</button>
-            <button class="chip" data-open="1">Time off policy</button>
-            <button class="chip" data-open="1">Clock-in issues</button>
-            <button class="chip" data-open="1">Add new employee</button>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Overlay + Drawer -->
-    <div id="botOverlay" aria-hidden="true"></div>
-    <aside id="botDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-label="Chat drawer">
-      <!-- Teal banner -->
-      <div id="drawerHeader">
-        <img src="https://ukginc.sharepoint.com/teams/Nish/SiteAssets/UKG%20Logo%20Large.png" alt="UKG">
-        <strong id="drawerTitle">UKG Ready Support Buddy</strong>
-        <button id="drawerClose" type="button" aria-label="Close">Close</button>
-      </div>
-
-      <!-- Toolbar under banner -->
-      <div id="drawerToolbar">
-        <div class="tabs" role="tablist" aria-label="Drawer tabs">
-          <button class="tab" role="tab" id="tabChat" aria-controls="panelChat" aria-selected="true">Chat</button>
-          <button class="tab" role="tab" id="tabLinks" aria-controls="panelLinks" aria-selected="false">Links</button>
-          <button class="tab" role="tab" id="tabTips" aria-controls="panelTips" aria-selected="false">Tips</button>
-        </div>
-        <div class="menu">
-          <button id="exportBtn" class="menu__btn" type="button" aria-haspopup="true" aria-expanded="false">Export ▼</button>
-          <div id="exportMenu" class="menu__popover" role="menu" aria-labelledby="exportBtn">
-            <button class="menu__item" role="menuitem" data-action="copy">Copy transcript</button>
-            <button class="menu__item" role="menuitem" data-action="txt">Download .txt</button>
-            <button class="menu__item" role="menuitem" data-action="json">Download .json</button>
-            <button class="menu__item" role="menuitem" data-action="email">Email transcript</button>
-            <div class="menu__hint">Only includes messages from this session.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panels -->
-      <div id="drawerBody">
-        <section id="panelChat" class="panel active" role="tabpanel" aria-labelledby="tabChat"></section>
-
-        <section id="panelLinks" class="panel" role="tabpanel" aria-labelledby="tabLinks" style="padding:12px;">
-          <ul style="list-style:none; padding:0; margin:0; display:grid; gap:8px;">
-            <li><a href="#" onclick="return false;">📘 Time Off Knowledge Base</a></li>
-            <li><a href="#" onclick="return false;">🕒 Clock-In Support</a></li>
-            <li><a href="#" onclick="return false;">👤 Add New Employee – Guide</a></li>
-            <li><a href="#" onclick="return false;">📈 System Status</a></li>
-          </ul>
-        </section>
-
-        <section id="panelTips" class="panel" role="tabpanel" aria-labelledby="tabTips" style="padding:12px;">
-          <ol style="margin:0 0 8px 18px;">
-            <li>Ask in natural language—be specific (include product area).</li>
-            <li>Share error text or a screenshot if you can.</li>
-            <li>Use follow-ups like “summarize steps” or “give me a checklist”.</li>
-          </ol>
-          <div class="cta">
-            <button class="chip" data-open="1">How do I approve timesheets?</button>
-            <button class="chip" data-open="1">Why is accrual balance off?</button>
-            <button class="chip" data-open="1">Export a payroll report</button>
-          </div>
-        </section>
-      </div>
-    </aside>
-
-    <noscript>This page hosts a chat assistant that requires JavaScript to run.</noscript>
-
-    <script>
-      (function(){
-        const drawer       = document.getElementById('botDrawer');
-        const overlay      = document.getElementById('botOverlay');
-        const openBtn      = document.getElementById('openDrawerBtn');
-        const closeBtn     = document.getElementById('closeDrawerBtn');
-        const headerClose  = document.getElementById('drawerClose');
-        const chips        = document.querySelectorAll('.chip');
-
-        const tabs = {
-          Chat:  { tab: document.getElementById('tabChat'),  panel: document.getElementById('panelChat')  },
-          Links: { tab: document.getElementById('tabLinks'), panel: document.getElementById('panelLinks') },
-          Tips:  { tab: document.getElementById('tabTips'),  panel: document.getElementById('panelTips')  },
-        };
-
-        /* ---- Transcript collector with de-dup ---- */
-        const transcript = [];
-        const seen = new Set(); // keys like "user|text" or "assistant|joinedText"
-
-        function addEntry(role, text){
-          if (!text) return;
-          const clean = String(text).trim();
-          if (!clean) return;
-          const key = `${role}|${clean}`;
-          if (seen.has(key)) return;         // prevent duplicates
-          seen.add(key);
-          transcript.push({ role, text: clean, ts: new Date().toISOString() });
-        }
-
-        // Helpers to extract text from various DF payload shapes
-        function extractStringsFromRichContent(rc){
-          const out = [];
-          try{
-            if (Array.isArray(rc)) {
-              rc.flat(2).forEach(item=>{
-                if (!item || typeof item !== 'object') return;
-                ['title','subtitle','text','description'].forEach(k=>{
-                  const v = item[k];
-                  if (typeof v === 'string') out.push(v);
-                  if (Array.isArray(v)) out.push(v.join('\n'));
-                });
-              });
-            }
-          }catch{}
-          return out;
-        }
-        function extractFromProtoFields(fields){
-          const out = [];
-          function walk(node){
-            if (!node) return;
-            if (node.stringValue) { out.push(node.stringValue); return; }
-            if (node.listValue?.values) node.listValue.values.forEach(walk);
-            if (node.structValue?.fields){
-              const f = node.structValue.fields;
-              ['title','subtitle','text','description','message','content'].forEach(k=>{
-                if (f[k]) walk(f[k]);
-              });
-              Object.values(f).forEach(walk);
-            }
-          }
-          walk({ structValue: { fields }});
-          return out;
-        }
-        function extractAssistantTexts(resp){
-          const texts = [];
-          const cxMsgs = resp?.responseMessages;
-          if (Array.isArray(cxMsgs)){
-            cxMsgs.forEach(m=>{
-              if (m?.text?.text) texts.push(...m.text.text);
-              if (m?.payload?.richContent) texts.push(...extractStringsFromRichContent(m.payload.richContent));
-              const f = m?.payload?.fields; if (f) texts.push(...extractFromProtoFields(f));
-            });
-          }
-          const esFulfillmentMsgs = resp?.queryResult?.fulfillmentMessages;
-          if (Array.isArray(esFulfillmentMsgs)){
-            esFulfillmentMsgs.forEach(m=>{
-              if (m?.text?.text) texts.push(...m.text.text);
-              if (m?.payload?.richContent) texts.push(...extractStringsFromRichContent(m.payload.richContent));
-              const f = m?.payload?.fields; if (f) texts.push(...extractFromProtoFields(f));
-            });
-          }
-          const esText = resp?.queryResult?.fulfillmentText; if (esText) texts.push(esText);
-          const qRespMsgs = resp?.queryResult?.responseMessages;
-          if (Array.isArray(qRespMsgs)){
-            qRespMsgs.forEach(m=>{
-              if (m?.text?.text) texts.push(...m.text.text);
-              if (m?.payload?.richContent) texts.push(...extractStringsFromRichContent(m.payload.richContent));
-              const f = m?.payload?.fields; if (f) texts.push(...extractFromProtoFields(f));
-            });
-          }
-          if (typeof resp?.text === 'string') texts.push(resp.text);
-          if (Array.isArray(resp?.messages)) {
-            resp.messages.forEach(m=>{
-              if (typeof m === 'string') texts.push(m);
-              if (m?.text) {
-                if (Array.isArray(m.text)) texts.push(...m.text);
-                if (typeof m.text === 'string') texts.push(m.text);
-              }
-            });
-          }
-          return Array.from(new Set(texts.map(s => String(s).trim()).filter(Boolean)));
-        }
-
-        function onRequest(e){
-          try{
-            const body = e.detail?.requestBody || e.detail?.data || {};
-            const txt = body?.queryInput?.text?.text || body?.queryInput?.event?.event || '';
-            if (txt) addEntry('user', txt);
-          }catch{}
-        }
-        function onResponse(e){
-          try{
-            const resp = e.detail?.response || e.detail?.data || {};
-            const texts = extractAssistantTexts(resp);
-            if (texts.length) addEntry('assistant', texts.join('\n\n'));
-          }catch{}
-        }
-
-        /* ---- Create Messenger ONLY when drawer first opens ---- */
-        let messengerInit = false;
-        let dfBound = false;
-        async function initMessengerOnce(){
-          if (messengerInit) return;
-          messengerInit = true;
-
-          if (!customElements.get('df-messenger')) {
-            try { await customElements.whenDefined('df-messenger'); } catch {}
-          }
-
-          const host = document.getElementById('panelChat');
-          host.innerHTML = '';
-
-          const df = document.createElement('df-messenger');
-          df.setAttribute('location', 'us-central1');
-          df.setAttribute('project-id', 'l-ulti-tf-48hours-d55d');
-          df.setAttribute('agent-id', '273402c4-3e14-486c-a519-ef1a95c4dbd5');
-          df.setAttribute('language-code', 'en');
-          df.setAttribute('allow-feedback', 'all');
-          // Fresh session on each page load
-          const sid = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sess-' + Math.random().toString(36).slice(2));
-          df.setAttribute('session-id', sid);
-
-          const inner = document.createElement('df-messenger-chat');
-          inner.setAttribute('chat-title', 'UKG Ready Support Buddy');
-          inner.setAttribute('chat-subtitle', 'We’re here to help');
-          inner.setAttribute('chat-title-icon', 'https://ukginc.sharepoint.com/teams/Nish/SiteAssets/UKG%20Logo%20Large.png');
-
-          df.appendChild(inner);
-          host.appendChild(df);
-
-          // Ensure layout after visible
-          requestAnimationFrame(()=>{ window.dispatchEvent(new Event('resize')); });
-
-          // Bind ONLY on the df element (no document-level listeners) to avoid duplicates
-          if (!dfBound){
-            df.addEventListener('df-request-sent', onRequest, {capture:true});
-            df.addEventListener('df-response-received', onResponse, {capture:true});
-            dfBound = true;
-          }
-        }
-
-        /* ---- Export helpers ---- */
-        function transcriptAsText(){
-          const header = `UKG Ready Support Buddy Transcript\nGenerated: ${new Date().toLocaleString()}\n\n`;
-          const lines = transcript.map(m => {
-            const who = m.role === 'user' ? 'User' : 'Assistant';
-            const time = new Date(m.ts).toLocaleString();
-            return `[${time}] ${who}: ${m.text}`;
-          });
-          return header + lines.join('\n');
-        }
-        function transcriptAsJSON(){ return JSON.stringify({ generatedAt:new Date().toISOString(), messages:transcript }, null, 2); }
-        function download(name, text, mime='text/plain'){
-          const blob = new Blob([text], {type:mime}); const url = URL.createObjectURL(blob);
-          const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
-          setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
-        }
-        async function copyToClipboard(text){
-          try { await navigator.clipboard.writeText(text); alert('Transcript copied to clipboard.'); }
-          catch { alert('Copy failed. Your browser may block clipboard access.'); }
-        }
-        function emailTranscript(){
-          const txt = transcriptAsText();
-          const subject = encodeURIComponent('UKG Ready Support Buddy transcript');
-          if (txt.length > 1800){
-            download('ukg-ready-transcript.txt', txt);
-            const body = encodeURIComponent('Transcript is lengthy, so a .txt file was downloaded.\n\nPlease attach it to this email.\n');
-            window.location.href = `mailto:?subject=${subject}&body=${body}`;
-          } else {
-            const body = encodeURIComponent(txt);
-            window.location.href = `mailto:?subject=${subject}&body=${body}`;
-          }
-        }
-
-        const exportBtn   = document.getElementById('exportBtn');
-        const exportMenu  = document.getElementById('exportMenu');
-        function toggleMenu(show){
-          const willShow = typeof show === 'boolean' ? show : !exportMenu.classList.contains('open');
-          exportMenu.classList.toggle('open', willShow);
-          exportBtn.setAttribute('aria-expanded', String(willShow));
-        }
-        exportBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
-        document.addEventListener('click', (e)=>{ if (!exportMenu.contains(e.target) && e.target !== exportBtn) toggleMenu(false); });
-        exportMenu.addEventListener('click', (e)=>{
-          const action = e.target?.getAttribute?.('data-action');
-          if (!action) return;
-          if (!transcript.length){ alert('No messages captured yet. Start a conversation first.'); return; }
-          if (action === 'copy') copyToClipboard(transcriptAsText());
-          if (action === 'txt')  download('ukg-ready-transcript.txt', transcriptAsText());
-          if (action === 'json') download('ukg-ready-transcript.json', transcriptAsJSON(), 'application/json');
-          if (action === 'email') emailTranscript();
-          toggleMenu(false);
-        });
-
-        /* ---- Drawer / Tabs / A11y ---- */
-        let lastFocused = null;
-
-        function setTab(activeKey){
-          Object.entries(tabs).forEach(([key, obj])=>{
-            const isActive = key === activeKey;
-            obj.tab.setAttribute('aria-selected', String(isActive));
-            obj.panel.classList.toggle('active', isActive);
-          });
-        }
-
-        async function openDrawer(preferTab){
-          lastFocused = document.activeElement;
-          openBtn?.setAttribute('aria-expanded','true');
-          drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
-          overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false');
-          if (closeBtn) closeBtn.style.display = '';
-          if (openBtn) openBtn.style.display = 'none';
-
-          setTab(preferTab || 'Chat');
-          await initMessengerOnce();  // create after visible
-          document.getElementById('tabChat').focus();
-          document.addEventListener('keydown', trapFocus);
-        }
-
-        function closeDrawer(){
-          drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
-          overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true');
-          if (closeBtn) closeBtn.style.display = 'none';
-          if (openBtn){ openBtn.style.display = ''; openBtn.setAttribute('aria-expanded','false'); }
-          if (lastFocused) lastFocused.focus();
-          document.removeEventListener('keydown', trapFocus);
-          toggleMenu(false);
-        }
-
-        function trapFocus(e){
-          if (e.key !== 'Tab') return;
-          const focusables = drawer.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
-          if (!focusables.length) return;
-          const first = focusables[0], last = focusables[focusables.length - 1];
-          if (e.shiftKey && document.activeElement === first){ last.focus(); e.preventDefault(); }
-          else if (!e.shiftKey && document.activeElement === last){ first.focus(); e.preventDefault(); }
-        }
-
-        // Events
-        openBtn?.addEventListener('click', ()=>openDrawer('Chat'));
-        closeBtn?.addEventListener('click', closeDrawer);
-        headerClose?.addEventListener('click', closeDrawer);
-        overlay.addEventListener('click', closeDrawer);
-        window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDrawer(); });
-
-        // Tabs
-        tabs.Chat.tab.addEventListener('click',  ()=> setTab('Chat'));
-        tabs.Links.tab.addEventListener('click', ()=> setTab('Links'));
-        tabs.Tips.tab.addEventListener('click',  ()=> setTab('Tips'));
-
-        // Chips: open drawer to Chat
-        chips.forEach(ch => ch.addEventListener('click', ()=> openDrawer('Chat')));
-
-        // URL triggers
-        const params = new URLSearchParams(location.search);
-        const shouldOpen = params.get('openChat') === '1' || location.hash === '#support';
-        if (shouldOpen) openDrawer('Chat');
-      })();
-    </script>
-  </body>
+</body>
 </html>
